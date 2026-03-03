@@ -46,13 +46,22 @@ if busqueda:
         elif texto_limpio in ['gracias', 'muchas gracias', 'excelente', 'listo', 'ok', 'va']:
             st.success("¡De nada! Para eso estamos. ¡A darle con todo a la producción! 🚀")
             
-        # 3. Si no es saludo ni gracias, entonces SÍ buscamos la falla en el Excel 🔍
+       # 3. Si no es saludo ni gracias, entonces SÍ buscamos la falla en el Excel 🔍
         else:
-            mask = tabla_maestra.astype(str).apply(lambda col: col.str.contains(busqueda, case=False, na=False)).any(axis=1)
+            # POKA-YOKE DE BÚSQUEDA: Borramos espacios accidentales que escriba el operador
+            busqueda_limpia = busqueda.strip()
+            
+            # Seguro: Si la palabra es corta (ej. "OT"), busca la palabra exacta
+            if len(busqueda_limpia) <= 3:
+                mask = tabla_maestra.astype(str).apply(lambda col: col.str.contains(r'\b' + busqueda_limpia + r'\b', case=False, na=False, regex=True)).any(axis=1)
+            else:
+                # Búsqueda normal para palabras largas o frases
+                mask = tabla_maestra.astype(str).apply(lambda col: col.str.contains(busqueda_limpia, case=False, na=False)).any(axis=1)
+                
             resultados = tabla_maestra[mask]
             
             if len(resultados) == 0:
-                st.warning(f"No encontré nada para '{busqueda}'.")
+                st.warning(f"No encontré nada para '{busqueda_limpia}'.")
             else:
                 st.success(f"¡Encontré {len(resultados)} soluciones!")
                 for index, fila in resultados.iterrows():
