@@ -5,24 +5,21 @@ import streamlit as st
 st.set_page_config(page_title="Asistente PROMINOX", page_icon="🤖")
 
 # OJO: Ya NO lleva el @st.cache_data para que lea tu Excel en tiempo real
-@st.cache_data(ttl=60) # Memoria con temporizador: se actualiza cada 60 segundos desde la nube
+@st.cache_data(ttl=10) # Se actualiza cada 10 segundos para no tener desfases
 def cargar_datos():
-    # Tu enlace convertido a formato de lectura directa para Python
     url_excel = "https://docs.google.com/spreadsheets/d/1dY2n8XXTDHZ1aj1MPAnDcrTIhZt6uTBL/export?format=xlsx"
-    
-    # Python ahora lee el archivo directamente desde el internet
     todas_las_hojas = pd.read_excel(url_excel, sheet_name=None, header=0)
     tabla_maestra = pd.DataFrame()
     
     for nombre_hoja, datos_hoja in todas_las_hojas.items():
-        # Limpiamos columnas
+        # Limpieza de títulos
         datos_hoja.columns = datos_hoja.columns.astype(str).str.replace('\n', ' ').str.strip()
+        
+        # EL FILTRO POKA-YOKE: Borra espacios invisibles en todas las celdas
+        datos_hoja = datos_hoja.applymap(lambda x: x.strip() if isinstance(x, str) else x)
+        
         datos_hoja = datos_hoja.ffill()
-        
-        # Etiquetamos de qué pestaña viene
-        datos_hoja['Maquina_o_Area'] = nombre_hoja
-        
-        # Juntamos todo en la base de datos central
+        datos_hoja['Maquina_o_Area'] = nombre_hoja.strip()
         tabla_maestra = pd.concat([tabla_maestra, datos_hoja], ignore_index=True)
         
     if 'Problemas comunes' in tabla_maestra.columns:
