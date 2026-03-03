@@ -7,13 +7,13 @@ st.set_page_config(page_title="Asistente PROMINOX", page_icon="🚀", layout="wi
 # --- CONFIGURACIÓN DE LÍNEAS ---
 # Aquí irás pegando los links de los Excels de cada línea conforme los crees
 LÍNEAS = {
-    "Línea 1": "https://docs.google.com/spreadsheets/d/1dY2n8XXTDHZ1aj1MPAnDcrTIhZt6uTBL/export?format=xlsx",
-    "Línea 2": "AQUÍ_PEGARÁS_EL_LINK_DE_LA_LINEA_2",
-    "Línea 3": "AQUÍ_PEGARÁS_EL_LINK_DE_LA_LINEA_3",
-    "Línea 4": "AQUÍ_PEGARÁS_EL_LINK_DE_LA_LINEA_4",
-    "Línea 5": "AQUÍ_PEGARÁS_EL_LINK_DE_LA_LINEA_5",
-    "Línea 6": "AQUÍ_PEGARÁS_EL_LINK_DE_LA_LINEA_6",
-    "Línea 7": "AQUÍ_PEGARÁS_EL_LINK_DE_LA_LINEA_7"
+    "LC2": "https://docs.google.com/spreadsheets/d/1dY2n8XXTDHZ1aj1MPAnDcrTIhZt6uTBL/export?format=xlsx",
+    "LC1": "https://docs.google.com/spreadsheets/d/1-f3swj7PF36MdwsWhObbPTQwd7voorG4/export?format=xlsx",
+    "LPH": "AQUÍ_PEGARÁS_EL_LINK_DE_LA_LINEA_3",
+    "LPR": "AQUÍ_PEGARÁS_EL_LINK_DE_LA_LINEA_4",
+    "LCL": "AQUÍ_PEGARÁS_EL_LINK_DE_LA_LINEA_5",
+    "MCL": "AQUÍ_PEGARÁS_EL_LINK_DE_LA_LINEA_6",
+    "OSC": "AQUÍ_PEGARÁS_EL_LINK_DE_LA_LINEA_7"
 }
 
 # 2. Encabezado con Cohete y NUEVA Bienvenida
