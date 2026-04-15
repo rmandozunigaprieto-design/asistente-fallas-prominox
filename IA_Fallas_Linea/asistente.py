@@ -1,4 +1,4 @@
-import streamlit as st
+ import streamlit as st
 import pandas as pd
 
 # 1. Configuración de la página 🚀
@@ -26,12 +26,13 @@ def cargar_datos(url):
     try:
         todas_las_hojas = pd.read_excel(url, sheet_name=None, header=0)
         tabla_maestra = pd.DataFrame()
+        
+        # Aquí el código lee pestaña por pestaña y guarda su nombre
         for nombre_hoja, datos_hoja in todas_las_hojas.items():
             datos_hoja.columns = datos_hoja.columns.astype(str).str.strip()
             datos_hoja['Maquina_o_Area'] = nombre_hoja.strip()
             tabla_maestra = pd.concat([tabla_maestra, datos_hoja], ignore_index=True)
             
-        # FILTRO POKA-YOKE: Borrar filas completamente vacías
         if 'Problemas comunes' in tabla_maestra.columns:
             tabla_maestra = tabla_maestra.dropna(subset=['Problemas comunes'])
             
@@ -47,7 +48,7 @@ else:
     tabla_maestra = cargar_datos(url_actual)
     
     if tabla_maestra is not None:
-        busqueda = st.text_input(f"🔍 Escribe aquí (falla, saludo o despedida) para la {linea_seleccionada}:", placeholder="Ej: Calidad, Sensor, Hola, Gracias...")
+        busqueda = st.text_input(f"🔍 Escribe aquí (falla, área, saludo o despedida):", placeholder="Ej: Calidad, Sensor, Falta de OT, Hola...")
 
         if busqueda:
             busqueda_limpia = busqueda.strip().lower()
@@ -64,22 +65,30 @@ else:
             elif busqueda_limpia in ["adios", "adiós", "bye", "hasta luego", "nos vemos", "hasta mañana", "ya me voy", "fin de turno"]:
                 st.success("¡Hasta luego, operador! 👋 Que tengas un excelente descanso, te lo has ganado. ¡Aquí estaré esperándote para el próximo turno! 🏭✨")
                 
-            # 4. Búsqueda de Fallas 🔍
+            # 4. BÚSQUEDA INTELIGENTE (Pestañas y Problemas) 🔍
             else:
-                mask = tabla_maestra.astype(str).apply(lambda col: col.str.contains(busqueda_limpia, case=False, na=False)).any(axis=1)
-                resultados = tabla_maestra[mask]
+                if 'Problemas comunes' in tabla_maestra.columns:
+                    # Busca si lo que escribiste coincide con el PROBLEMA
+                    mask_problema = tabla_maestra['Problemas comunes'].astype(str).str.contains(busqueda_limpia, case=False, na=False)
+                    # O busca si coincide con la PESTAÑA (Área)
+                    mask_area = tabla_maestra['Maquina_o_Area'].astype(str).str.contains(busqueda_limpia, case=False, na=False)
+                    
+                    # Junta los dos filtros
+                    mask = mask_problema | mask_area
+                    resultados = tabla_maestra[mask]
+                else:
+                    resultados = pd.DataFrame() 
                 
                 if len(resultados) == 0:
-                    st.error("Hmm, no encontré esa falla en mis manuales. 🤔 ¿Podrías escribirlo con otras palabras?")
+                    st.error("Hmm, no encontré esa falla ni esa área. 🤔 ¿Podrías revisarlo?")
                 else:
-                    st.success(f"¡Excelente! Encontré {len(resultados)} posibles soluciones. Aquí te las muestro:")
+                    st.success(f"¡Excelente! Encontré {len(resultados)} resultados. Aquí tienes:")
                     for index, fila in resultados.iterrows():
                         with st.expander(f"📍 ÁREA: {fila['Maquina_o_Area']}", expanded=True):
                             
-                            # LA MAGIA DE LA LIMPIEZA VISUAL 🧹✨
+                            # Limpieza para que no salgan cosas raras o "None"
                             for col in resultados.columns:
                                 val = fila[col]
-                                # Ignoramos las columnas feas de Excel y los valores nulos o "None"
                                 if col != 'Maquina_o_Area' and 'Unnamed' not in str(col):
                                     if pd.notna(val) and str(val).strip().lower() not in ['none', 'nan', '']:
                                         st.markdown(f"*{col}*: {val}")
