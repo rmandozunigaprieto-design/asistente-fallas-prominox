@@ -17,7 +17,7 @@ LÍNEAS = {
 }
 
 st.title("🚀 Asistente Técnico PROMINOX")
-st.info("🤖 ¡Bienvenido! Selecciona tu línea para resolver la falla.")
+st.info("🤖 ¡Bienvenido operador! Selecciona tu línea y dime que falla podemos resolver juntos.")
 
 st.markdown("---")
 
